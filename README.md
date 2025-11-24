@@ -1,6 +1,9 @@
 # CSC466-Final-Project
 
 Collaborators:
+* Emily Yarvis
+* Rishabh Jhamnani
+* Sai Murthy
 
 Documentation:
 * [Slides](https://docs.google.com/presentation/d/1rHTUbnXsUMb1v8ZRiTlVCG0-OCeOGsVRgm-TIYiPmnA/edit?usp=sharing)
