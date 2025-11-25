@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.csv.CSVFormat;
@@ -25,6 +27,36 @@ public class Main {
         for(var m: movies){
             System.out.println(m.toString());
         }
+
+        MovieMatrix recommender = new MovieMatrix(movies);
+
+// Find index of a movie by title
+        while (true) {
+
+            int movieIdx = -1;
+            String movie = getCustomerMovieName();
+            if(movie.equalsIgnoreCase("Exit")){
+                System.out.println("Goodbye!");
+                break;
+            }
+            for (int i = 0; i < movies.size(); i++) {
+                if (movie.equalsIgnoreCase(movies.get(i).title)) {
+                    movieIdx = i;
+                    break;
+                }
+            }
+
+            if (movieIdx >= 0) {
+                List<Movie> recs = recommender.recommendSimilar(movieIdx, 10);
+                System.out.println("Because you watched: " + movies.get(movieIdx).title);
+                for (Movie m : recs) {
+                    System.out.println("  -> " + m.title + "  (" + m.voteAverage + ", " + m.genres + ")");
+                }
+            } else {
+                System.out.println("I'm sorry I cant make a recommendation for that movie");
+            }
+        }
+
     }
 
     public static void write2OutputFile(String filename, int[][] data) throws IOException {
@@ -144,6 +176,16 @@ public class Main {
         if (s == null) return null;
         s = s.trim();
         return s.isEmpty() ? null : s;
+    }
+
+    public static String getCustomerMovieName(){
+        Scanner sc = new Scanner(System.in);
+        
+            System.out.print("Enter name of movie for a new recommendation: ");
+            String response = sc.nextLine();
+
+
+        return response;
     }
 }
 
