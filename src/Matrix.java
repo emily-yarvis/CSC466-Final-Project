@@ -4,13 +4,51 @@ public class Matrix {
     private int[][] data;
     private int rows;
     private int cols;
+    private double[] means;
+    private double[] stds;
+
 
 
     public Matrix(int[][] data) {
         this.rows = data.length;
         this.cols = data[0].length;
         this.data = data;
+
+        computeZScoreStats();
     }
+
+    private void computeZScoreStats() {
+        int labelIndex = getCategoryAttribute();  // last column
+        int featureCount = labelIndex;
+
+        means = new double[featureCount];
+        stds  = new double[featureCount];
+
+        //mean calc
+        for (int j = 0; j < featureCount; j++) {
+            double sum = 0.0;
+            for (int i = 0; i < data.length; i++) {
+                sum += data[i][j];
+            }
+            means[j] = sum / data.length;
+        }
+
+        //std calc
+        for (int j = 0; j < featureCount; j++) {
+            double sumSq = 0.0;
+            for (int i = 0; i < data.length; i++) {
+                double diff = data[i][j] - means[j];
+                sumSq += diff * diff;
+            }
+            stds[j] = Math.sqrt(sumSq / data.length);
+
+            // avoid div by zero error
+            if (stds[j] == 0.0) {
+                stds[j] = 1.0;
+            }
+        }
+    }
+
 
     private static class Neighbor {
         double distance;
@@ -238,12 +276,19 @@ public class Matrix {
         double sum = 0.0;
 
         for (int i = 0; i < labelIndex; i++) {
-            double diff = row[i] - data[rowIndex][i];
+            double q = z(row[i], i);
+            double t = z(data[rowIndex][i], i);
+            double diff = q - t;
             sum += diff * diff;
         }
 
         return Math.sqrt(sum);
     }
+
+    private double z(int value, int featureIndex) {
+        return (value - means[featureIndex]) / stds[featureIndex];
+    }
+
 
 
 }
