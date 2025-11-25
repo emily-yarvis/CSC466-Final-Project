@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +7,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
         int[][] data = process("src/labs/Lab7/" +
                 "data.txt");
+        var matrix = new Matrix(data);
 
+        System.out.println("Prediction: "+matrix.predictWithKNN(4, new int[]{0, 4, 3, 2}));
 
     }
 

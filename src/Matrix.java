@@ -12,6 +12,16 @@ public class Matrix {
         this.data = data;
     }
 
+    private static class Neighbor {
+        double distance;
+        int index;
+
+        Neighbor(double distance, int index) {
+            this.distance = distance;
+            this.index = index;
+        }
+    }
+
     private int findFrequencyGivenLabel(int attribute, int value,int labelValue, ArrayList<Integer> rows){
         var count = 0;
         for(int rowNum: rows){
@@ -193,5 +203,47 @@ public class Matrix {
         }
         return labels;
     }
+
+    public int predictWithKNN(int k, int[] row){
+
+        var indices = getKNN(k, row);
+        int sum = 0;
+        for(var num: indices){
+                sum+=data[num][getCategoryAttribute()];
+        }
+        return sum/ indices.size();
+    }
+    public ArrayList<Integer> getKNN(int k, int[] row){
+        ArrayList<Integer> nearestNeighbors = new ArrayList();
+        List<Neighbor> neighbors = new ArrayList<>();
+
+        for (int i = 0; i < data.length; i++) {
+            double d = distanceToRow(row, i);
+            neighbors.add(new Neighbor(d, i));
+        }
+
+        neighbors.sort(Comparator.comparingDouble(n -> n.distance));
+
+        int limit = Math.min(k, neighbors.size());//in case there's not enough data(very unlikely)
+        for (int i = 0; i < limit; i++) {
+            Neighbor n = neighbors.get(i);
+            nearestNeighbors.add(n.index);
+        }
+        return nearestNeighbors;
+    }
+
+    // gets distance between requested row and some index
+    private double distanceToRow(int[] row, int rowIndex) {
+        int labelIndex = getCategoryAttribute(); // label column
+        double sum = 0.0;
+
+        for (int i = 0; i < labelIndex; i++) {
+            double diff = row[i] - data[rowIndex][i];
+            sum += diff * diff;
+        }
+
+        return Math.sqrt(sum);
+    }
+
 
 }
