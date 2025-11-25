@@ -3,7 +3,7 @@ import java.util.*;
 public class MovieMatrix {
 
     private final List<Movie> movies;
-    private final double[][] X;  // features
+    private final double[][] data;  // features
     private final double[] means;
     private final double[] stds;
 
@@ -17,10 +17,10 @@ public class MovieMatrix {
 
     public MovieMatrix(List<Movie> movies) {
         this.movies = movies;
-        this.X = toFeatureMatrix(movies);
+        this.data = toFeatureMatrix(movies);
 
-        int n = X.length;
-        int d = X[0].length;
+        int n = data.length;
+        int d = data[0].length;
 
         means = new double[d];
         stds  = new double[d];
@@ -29,7 +29,7 @@ public class MovieMatrix {
         for (int j = 0; j < d; j++) {
             double sum = 0;
             for (int i = 0; i < n; i++) {
-                sum += X[i][j];
+                sum += data[i][j];
             }
             means[j] = sum / n;
         }
@@ -38,7 +38,7 @@ public class MovieMatrix {
         for (int j = 0; j < d; j++) {
             double sumSq = 0;
             for (int i = 0; i < n; i++) {
-                double diff = X[i][j] - means[j];
+                double diff = data[i][j] - means[j];
                 sumSq += diff * diff;
             }
             stds[j] = Math.sqrt(sumSq / n);
@@ -58,10 +58,10 @@ public class MovieMatrix {
         Map<String,Integer> genreIndex = buildGenreIndex();
 
         int g = genreIndex.size();
-        int extra = 4;     // runtime, popularity, voteAverage, logRevenue
+        int extra = 5;     // runtime, popularity, voteAverage, logRevenue, releaseDate
         int dim = g + extra;
 
-        double[][] X = new double[movies.size()][dim];
+        double[][] featureMatrix = new double[movies.size()][dim];
 
         for (int i = 0; i < movies.size(); i++) {
             Movie m = movies.get(i);
@@ -80,14 +80,23 @@ public class MovieMatrix {
             row[offset + 0] = m.runtime;                                // maybe 100-200
             row[offset + 1] = m.popularity;                             // ~0-400
             row[offset + 2] = m.voteAverage;                            // 0-10
-            row[offset + 3] = Math.log1p(m.revenue);                    // log scale
+            row[offset + 3] = Math.log1p(m.revenue);// log scale
+            row[offset + 4] = extractYear(m.releaseDate);
 
-            X[i] = row;
+
+            featureMatrix[i] = row;
         }
 
-        return X;
+        return featureMatrix;
     }
-
+    private static int extractYear(String date) {
+        if (date == null || date.isEmpty()) return 0;
+        try {
+            return Integer.parseInt(date.substring(0, 4));  // first 4 chars
+        } catch (Exception e) {
+            return 0;
+        }
+    }
     private double z(double value, int j) {
         return (value - means[j]) / stds[j];
     }
@@ -105,12 +114,12 @@ public class MovieMatrix {
 
     // Get k nearest movies to movie index `idx` (excluding idx)
     public List<Movie> recommendSimilar(int idx, int k) {
-        double[] query = X[idx];
+        double[] query = data[idx];
         List<Neighbor> neighbors = new ArrayList<>();
 
-        for (int i = 0; i < X.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             if (i == idx) continue;
-            double d = distance(query, X[i]);
+            double d = distance(query,data[i]);
             neighbors.add(new Neighbor(d, i));
         }
 

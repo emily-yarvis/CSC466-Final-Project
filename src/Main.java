@@ -18,8 +18,7 @@ public class Main {
     private static final Gson GSON = new Gson();
 
     static public void main(String[] args) throws IOException {
-        int[][] data = process("src/labs/Lab7/" +
-                "data.txt");
+        int[][] data = process("CSC466-Final-Project/data/data.txt");
         var matrix = new Matrix(data);
 
         System.out.println("Prediction: "+matrix.predictWithKNN(4, new int[]{0, 4, 3, 2}));
@@ -50,7 +49,7 @@ public class Main {
                 List<Movie> recs = recommender.recommendSimilar(movieIdx, 10);
                 System.out.println("Because you watched: " + movies.get(movieIdx).title);
                 for (Movie m : recs) {
-                    System.out.println("  -> " + m.title + "  (" + m.voteAverage + ", " + m.genres + ")");
+                    System.out.println("  -> " + m.title + "  (" + m.releaseDate + ", " + m.genres + ")");
                 }
             } else {
                 System.out.println("I'm sorry I cant make a recommendation for that movie");
@@ -180,7 +179,7 @@ public class Main {
 
     public static String getCustomerMovieName(){
         Scanner sc = new Scanner(System.in);
-        
+
             System.out.print("Enter name of movie for a new recommendation: ");
             String response = sc.nextLine();
 
