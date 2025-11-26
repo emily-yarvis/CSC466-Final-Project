@@ -18,10 +18,10 @@ public class Main {
     private static final Gson GSON = new Gson();
 
     static public void main(String[] args) throws IOException {
-        int[][] data = process("CSC466-Final-Project/data/data.txt");
-        var matrix = new Matrix(data);
-
-        System.out.println("Prediction: "+matrix.predictWithKNN(4, new int[]{0, 4, 3, 2}));
+//        int[][] data = process("CSC466-Final-Project/data/data.txt");
+//        var matrix = new Matrix(data);
+//
+//        System.out.println("Prediction: "+matrix.predictWithKNN(4, new int[]{0, 4, 3, 2}));
         var movies =loadMovies(Path.of("CSC466-Final-Project/data/tmdb_5000_movies.csv"));
         for(var m: movies){
             System.out.println(m.toString());
