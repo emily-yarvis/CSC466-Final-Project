@@ -148,19 +148,19 @@ public class MainRish {
 
     public static void main(String[] args) {
         // 1. Parse your CSV into a list of MovieRish
-        List<MovieRish> movies = parseData("data/movies_metadata_small.csv");
+        List<MovieRish> movies = parseData("data/movies_metadata_small_mil.csv");
 
         // 2. Create MovieMatrixRish with features, means, stds
         MovieMatrixRish matrix = new MovieMatrixRish(movies);
 
-        int x = 0;
-        for (MovieRish movie : movies) {
-            if (x >= 5) {
-                break;
-            }
-            System.out.println(movie.getTitle() + " " + movie.getVoteAverage());
-            x++;
-        }
+//        int x = 0;
+//        for (MovieRish movie : movies) {
+//            if (x >= 5) {
+//                break;
+//            }
+//            System.out.println(movie.getTitle() + " " + movie.getVoteAverage());
+//            x++;
+//        }
 
         // 3. Ask user for movie title
         Scanner scanner = new Scanner(System.in);
@@ -171,6 +171,7 @@ public class MainRish {
         for (int i = 0; i < movies.size(); i++) {
             if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
                 selectedMovie = movies.get(i);
+                System.out.println("Real rating: " + selectedMovie.getVoteAverage());
                 movieIdx = i;
                 break;
             }
