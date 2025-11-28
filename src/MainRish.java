@@ -148,7 +148,7 @@ public class MainRish {
 
     public static void main(String[] args) {
         // 1. Parse your CSV into a list of MovieRish
-        List<MovieRish> movies = parseData("data/movies_metadata_small_mil.csv");
+        List<MovieRish> movies = parseData("CSC466-Final-Project/data/movies_metadata_small.csv");
 
         // 2. Create MovieMatrixRish with features, means, stds
         MovieMatrixRish matrix = new MovieMatrixRish(movies);
@@ -163,29 +163,36 @@ public class MainRish {
 //        }
 
         // 3. Ask user for movie title
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter a movie title: ");
-        String inputTitle = scanner.nextLine().toLowerCase();
-        MovieRish selectedMovie = null;
-        int movieIdx = -1;
-        for (int i = 0; i < movies.size(); i++) {
-            if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
-                selectedMovie = movies.get(i);
-                System.out.println("Real rating: " + selectedMovie.getVoteAverage());
-                movieIdx = i;
-                break;
+            while(true) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter a movie title: ");
+                String inputTitle = scanner.nextLine().toLowerCase();
+                if(inputTitle.equalsIgnoreCase("Quit")){
+                    break;
+                }
+                MovieRish selectedMovie = null;
+                int movieIdx = -1;
+                for (int i = 0; i < movies.size(); i++) {
+                    if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
+                        selectedMovie = movies.get(i);
+                        System.out.println("Real rating: " + selectedMovie.getVoteAverage());
+                        movieIdx = i;
+                        break;
+                    }
+                }
+
+                if (selectedMovie == null) {
+                    System.out.println("Movie not found in dataset.");
+
+                }
+                else {
+
+                    // 5. Predict rating using KNN (choose k, e.g., 5)
+                    int k = 5;
+                    double predictedRating = matrix.predictRating(movieIdx, k);
+
+                    System.out.println("Predicted rating for \"" + selectedMovie.getTitle() + "\": " + predictedRating);
+                }
             }
         }
-
-        if (selectedMovie == null) {
-            System.out.println("Movie not found in dataset.");
-            return;
-        }
-
-        // 5. Predict rating using KNN (choose k, e.g., 5)
-        int k = 5;
-        double predictedRating = matrix.predictRating(movieIdx, k);
-
-        System.out.println("Predicted rating for \"" + selectedMovie.getTitle() + "\": " + predictedRating);
-    }
 }
