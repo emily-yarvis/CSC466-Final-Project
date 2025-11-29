@@ -1,12 +1,12 @@
 import java.util.List;
 
-public class CollectionInfoRish {
+public class CollectionInfo {
     private int id;
     private String name;
     private String posterPath;
     private String backdropPath;
 
-    public CollectionInfoRish(int id, String name, String posterPath, String backdropPath) {
+    public CollectionInfo(int id, String name, String posterPath, String backdropPath) {
         this.id = id;
         this.name = name;
         this.posterPath = posterPath;

@@ -1,191 +1,198 @@
-//
-//import java.io.*;
-//import java.nio.file.Files;
-//import java.nio.file.Path;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
-//import java.util.Scanner;
-//
-//import com.google.gson.Gson;
-//import com.google.gson.reflect.TypeToken;
-//import org.apache.commons.csv.CSVFormat;
-//import org.apache.commons.csv.CSVParser;
-//import org.apache.commons.csv.CSVRecord;
-//
-//
-//public class Main {
-//    private static final Gson GSON = new Gson();
-//
-//    static public void main(String[] args) throws IOException {
-////        int[][] data = process("CSC466-Final-Project/data/data.txt");
-////        var matrix = new Matrix(data);
-////
-////        System.out.println("Prediction: "+matrix.predictWithKNN(4, new int[]{0, 4, 3, 2}));
-//        var movies =loadMovies(Path.of("CSC466-Final-Project/data/tmdb_5000_movies.csv"));
-//        for(var m: movies){
-//            System.out.println(m.toString());
-//        }
-//
-//        MovieMatrix recommender = new MovieMatrix(movies);
-//
-//// Find index of a movie by title
-//        while (true) {
-//
-//            int movieIdx = -1;
-//            String movie = getCustomerMovieName();
-//            if(movie.equalsIgnoreCase("Exit")){
-//                System.out.println("Goodbye!");
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+
+    /**
+     * Parses a movies CSV and returns a list of MovieRish objects.
+     * Adjust the indices to match your CSV column order.
+     */
+    private static List<Movie> parseData(String csvFilePath) {
+        List<Movie> movies = new ArrayList<>();
+
+        try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
+            String[] line;
+            boolean firstLine = true;
+
+            while ((line = reader.readNext()) != null) {
+                // Skip header
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+
+                try {
+                    boolean adult = Boolean.parseBoolean(line[0]);
+                    CollectionInfo collection = null;
+                    if (!line[1].isEmpty()) {
+                        collection = new CollectionInfo(0, line[1], "", "");
+                    }
+
+                    long budget = line[2].isEmpty() ? 0 : Long.parseLong(line[2]);
+                    List<Genre> genres = parseGenres(line[3]);
+                    String homepage = line[4];
+                    int id = line[5].isEmpty() ? 0 : Integer.parseInt(line[5]);
+                    String imdbId = line[6];
+                    String originalLanguage = line[7];
+                    String originalTitle = line[8];
+                    String overview = line[9];
+                    double popularity = line[10].isEmpty() ? 0 : Double.parseDouble(line[10]);
+                    String posterPath = line[11];
+                    List<ProductionCompany> companies = parseCompanies(line[12]);
+                    List<Country> countries = parseCountries(line[13]);
+                    LocalDate releaseDate = parseDate(line[14]);
+                    long revenue = line[15].isEmpty() ? 0 : Long.parseLong(line[15]);
+                    double runtime = line[16].isEmpty() ? 0 : Double.parseDouble(line[16]);
+                    List<Language> languages = parseLanguages(line[17]);
+                    String status = line[18];
+                    String tagline = line[19];
+                    String title = line[20];
+                    boolean video = Boolean.parseBoolean(line[21]);
+                    double voteAverage = line[22].isEmpty() ? 0 : Double.parseDouble(line[22]);
+                    int voteCount = line[23].isEmpty() ? 0 : Integer.parseInt(line[23]);
+
+                    Movie movie = new Movie(
+                            adult, collection, budget, genres, homepage, id, imdbId,
+                            originalLanguage, originalTitle, overview, popularity,
+                            posterPath, companies, countries, releaseDate, revenue,
+                            runtime, languages, status, tagline, title, video,
+                            voteAverage, voteCount
+                    );
+
+                    movies.add(movie);
+
+                } catch (Exception e) {
+                    System.err.println("Error parsing line: " + e.getMessage());
+                }
+            }
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
+
+        return movies;
+    }
+
+    // Helper parsers (simplified, adjust according to your CSV format)
+    private static List<Genre> parseGenres(String cell) {
+        List<Genre> genres = new ArrayList<>();
+        if (cell == null || cell.isEmpty()) return genres;
+
+        // Assuming JSON-like: [{'id': 16, 'name': 'Animation'}, ...]
+        String[] items = cell.replace("[","").replace("]","").split("\\},\\s*\\{");
+        for (String item : items) {
+            if (item.contains("name")) {
+                String name = item.split("'name':")[1].replaceAll("[^a-zA-Z ]", "").trim();
+                genres.add(new Genre(0, name));
+            }
+        }
+        return genres;
+    }
+
+    private static List<ProductionCompany> parseCompanies(String cell) {
+        List<ProductionCompany> companies = new ArrayList<>();
+        if (cell == null || cell.isEmpty()) return companies;
+
+        String[] items = cell.replace("[","").replace("]","").split("\\},\\s*\\{");
+        for (String item : items) {
+            if (item.contains("name")) {
+                String name = item.split("'name':")[1].replaceAll("[^a-zA-Z ]", "").trim();
+                companies.add(new ProductionCompany(0, name));
+            }
+        }
+        return companies;
+    }
+
+    private static List<Country> parseCountries(String cell) {
+        List<Country> countries = new ArrayList<>();
+        if (cell == null || cell.isEmpty()) return countries;
+
+        String[] items = cell.replace("[","").replace("]","").split("\\},\\s*\\{");
+        for (String item : items) {
+            if (item.contains("iso_3166_1")) {
+                String iso = item.split("'iso_3166_1':")[1].replaceAll("[^A-Z]", "").trim();
+                countries.add(new Country(iso, ""));
+            }
+        }
+        return countries;
+    }
+
+    private static List<Language> parseLanguages(String cell) {
+        List<Language> langs = new ArrayList<>();
+        if (cell == null || cell.isEmpty()) return langs;
+
+        String[] items = cell.replace("[","").replace("]","").split("\\},\\s*\\{");
+        for (String item : items) {
+            if (item.contains("iso_639_1")) {
+                String iso = item.split("'iso_639_1':")[1].replaceAll("[^a-z]", "").trim();
+                langs.add(new Language(iso, ""));
+            }
+        }
+        return langs;
+    }
+
+    private static LocalDate parseDate(String cell) {
+        if (cell == null || cell.isEmpty()) return null;
+        try {
+            return LocalDate.parse(cell);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        // 1. Parse your CSV into a list of MovieRish
+        List<Movie> movies = parseData("CSC466-Final-Project/data/movies_metadata_small.csv");
+
+        // 2. Create MovieMatrixRish with features, means, stds
+        MovieMatrix matrix = new MovieMatrix(movies);
+
+//        int x = 0;
+//        for (MovieRish movie : movies) {
+//            if (x >= 5) {
 //                break;
 //            }
-//            for (int i = 0; i < movies.size(); i++) {
-//                if (movie.equalsIgnoreCase(movies.get(i).title)) {
-//                    movieIdx = i;
-//                    break;
-//                }
-//            }
-//
-//            if (movieIdx >= 0) {
-//                List<Movie> recs = recommender.recommendSimilar(movieIdx, 10);
-//                System.out.println("Because you watched: " + movies.get(movieIdx).title);
-//                for (Movie m : recs) {
-//                    System.out.println("  -> " + m.title + "  (" + m.releaseDate + ", " + m.genres + ")");
-//                }
-//            } else {
-//                System.out.println("I'm sorry I cant make a recommendation for that movie");
-//            }
+//            System.out.println(movie.getTitle() + " " + movie.getVoteAverage());
+//            x++;
 //        }
-//
-//    }
-//
-//    public static void write2OutputFile(String filename, int[][] data) throws IOException {
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-//            for (int[] row : data) {
-//                for (int i = 0; i < row.length; i++) {
-//                    writer.write(Integer.toString(row[i]));
-//                    if (i < row.length - 1) writer.write(" ");
-//                }
-//                writer.newLine();
-//            }
-//        }
-//    }
-//
-//    public static int[][] process(String filename) {
-//        ArrayList<int[]> rows = new ArrayList<>();
-//        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-//            for (String line; (line = br.readLine()) != null; ) {
-//                line = line.trim();
-//                if (line.isEmpty()) continue;
-//                String[] parts = line.split(",");
-//                if (parts.length != 5) throw new IllegalArgumentException("Bad row: " + line);
-//
-//                int[] row = new int[5];
-//                for (int i = 0; i < 4; i++) {
-//                    double v = Double.parseDouble(parts[i]);
-//                    row[i] = (int) v;
-//                }
-//                row[4] = Integer.parseInt(parts[4]); // class label 1,2,3
-//                rows.add(row);
-//            }
-//        } catch (FileNotFoundException e) {
-//            throw new RuntimeException(e);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return rows.toArray(new int[0][]);
-//
-//    } //creates a two-dimensional array from the input file.
-//
-//    public static List<Movie> loadMovies(Path csvPath) throws IOException {
-//        List<Movie> movies = new ArrayList<>();
-//
-//        try (Reader in = Files.newBufferedReader(csvPath);
-//             CSVParser parser = CSVFormat.DEFAULT
-//                     .withFirstRecordAsHeader()//use header row included in data to parse
-//                     .withTrim()
-//                     .parse(in)) {
-//
-//            for (CSVRecord rec : parser) {
-//                Movie m = new Movie();
-//
-//                m.budget = parseLong(rec.get("budget"));
-//                m.genres = parseGenres(rec.get("genres"));
-//                m.homepage = emptyToNull(rec.get("homepage"));
-//                m.id = (int) parseLong(rec.get("id"));
-//                m.keywordsRaw = rec.get("keywords");
-//                m.originalLanguage = rec.get("original_language");
-//                m.originalTitle = rec.get("original_title");
-//                m.overview = rec.get("overview");
-//                m.popularity = parseDouble(rec.get("popularity"));
-//                m.productionCompaniesRaw = rec.get("production_companies");
-//                m.productionCountriesRaw = rec.get("production_countries");
-//                m.releaseDate = rec.get("release_date");
-//                m.revenue = parseLong(rec.get("revenue"));
-//
-//                m.runtime = (int) Math.round(parseDouble(rec.get("runtime")));
-//
-//                m.spokenLanguagesRaw = rec.get("spoken_languages");
-//                m.status = rec.get("status");
-//                m.tagline = rec.get("tagline");
-//                m.title = rec.get("title");
-//                m.voteAverage = parseDouble(rec.get("vote_average"));
-//                m.voteCount = (int) parseLong(rec.get("vote_count"));
-//
-//                movies.add(m);
-//            }
-//        }
-//
-//        return movies;
-//    }
-//
-//
-//    private static List<Genre> parseGenres(String json) {
-//        if (json == null || json.isBlank() || json.equals("[]")) {
-//            return List.of();
-//        }
-//        try {
-//
-//            return GSON.fromJson(json, new TypeToken<List<Genre>>() {}.getType());
-//        } catch (Exception e) {
-//            System.err.println("Failed to parse genres JSON: " + json);
-//            e.printStackTrace();
-//            return List.of();
-//        }
-//    }
-//
-//
-//    private static long parseLong(String s) {
-//        if (s == null) return 0L;
-//        s = s.trim();
-//        if (s.isEmpty()) return 0L;
-//        if (s.contains(".")) {
-//            return (long) Double.parseDouble(s);
-//        }
-//        return Long.parseLong(s);
-//    }
-//
-//    private static double parseDouble(String s) {
-//        if (s == null) return 0.0;
-//        s = s.trim();
-//        if (s.isEmpty()) return 0.0;
-//        return Double.parseDouble(s);
-//    }
-//
-//    private static String emptyToNull(String s) {
-//        if (s == null) return null;
-//        s = s.trim();
-//        return s.isEmpty() ? null : s;
-//    }
-//
-//    public static String getCustomerMovieName(){
-//        Scanner sc = new Scanner(System.in);
-//
-//            System.out.print("Enter name of movie for a new recommendation: ");
-//            String response = sc.nextLine();
-//
-//
-//        return response;
-//    }
-//}
-//
-//
+
+        // 3. Ask user for movie title
+            while(true) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter a movie title: ");
+                String inputTitle = scanner.nextLine().toLowerCase();
+                if(inputTitle.equalsIgnoreCase("Quit")){
+                    break;
+                }
+                Movie selectedMovie = null;
+                int movieIdx = -1;
+                for (int i = 0; i < movies.size(); i++) {
+                    if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
+                        selectedMovie = movies.get(i);
+                        System.out.println("Real rating: " + selectedMovie.getVoteAverage());
+                        movieIdx = i;
+                        break;
+                    }
+                }
+
+                if (selectedMovie == null) {
+                    System.out.println("Movie not found in dataset.");
+
+                }
+                else {
+
+                    // 5. Predict rating using KNN (choose k, e.g., 5)
+                    int k = 5;
+                    double predictedRating = matrix.predictRating(movieIdx, k);
+
+                    System.out.println("Predicted rating for \"" + selectedMovie.getTitle() + "\": " + predictedRating);
+                }
+            }
+        }
+}

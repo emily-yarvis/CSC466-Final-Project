@@ -1,10 +1,10 @@
 import java.util.List;
 
-public class ProductionCompanyRish {
+public class ProductionCompany {
     private int id;
     private String name;
 
-    public ProductionCompanyRish(int id, String name) {
+    public ProductionCompany(int id, String name) {
         this.id = id;
         this.name = name;
     }

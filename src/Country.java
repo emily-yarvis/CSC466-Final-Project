@@ -1,10 +1,10 @@
 import java.util.List;
 
-public class CountryRish {
+public class Country {
     private String isoCode;
     private String name;
 
-    public CountryRish(String isoCode, String name) {
+    public Country(String isoCode, String name) {
         this.isoCode = isoCode;
         this.name = name;
     }
