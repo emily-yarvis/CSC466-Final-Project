@@ -1,5 +1,3 @@
-import java.util.List;
-
 public class Genre {
     private int id;
     private String name;
