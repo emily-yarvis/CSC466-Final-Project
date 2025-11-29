@@ -146,53 +146,95 @@ public class Main {
         }
     }
 
+    private static Profile buildProfile(List<Movie> movies){
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Your Name: ");
+        String inputName = scanner.nextLine().toLowerCase();
+        ArrayList<Integer> movieIdxs = new ArrayList<>();
+
+        while(true) {
+            System.out.print("Enter a movie title or Done if you have no more: ");
+            String inputTitle = scanner.nextLine().toLowerCase();
+            if (inputTitle.equalsIgnoreCase("Done")) {
+                break;
+            }
+            Movie selectedMovie = null;
+            int movieIdx = -1;
+            for (int i = 0; i < movies.size(); i++) {
+                if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
+                    selectedMovie = movies.get(i);
+                    System.out.println("Real rating: " + selectedMovie.getVoteAverage());
+                    movieIdx = i;
+                    break;
+                }
+            }
+            movieIdxs.add(movieIdx);
+            if (selectedMovie == null) {
+                System.out.println("Movie not found in dataset.");
+
+            }
+        }
+        return new Profile(inputName, movieIdxs);
+    }
+    private static void performKNN(List<Movie> movies, MovieMatrix matrix){
+        while(true) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter a movie title: ");
+            String inputTitle = scanner.nextLine().toLowerCase();
+            if(inputTitle.equalsIgnoreCase("Quit")){
+                break;
+            }
+            Movie selectedMovie = null;
+            int movieIdx = -1;
+            for (int i = 0; i < movies.size(); i++) {
+                if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
+                    selectedMovie = movies.get(i);
+                    System.out.println("Real rating: " + selectedMovie.getVoteAverage());
+                    movieIdx = i;
+                    break;
+                }
+            }
+
+            if (selectedMovie == null) {
+                System.out.println("Movie not found in dataset.");
+
+            }
+            else {
+
+                // 5. Predict rating using KNN (choose k, e.g., 5)
+                int k = 5;
+                double predictedRating = matrix.predictRating(movieIdx, k);
+
+                System.out.println("Predicted rating for \"" + selectedMovie.getTitle() + "\": " + predictedRating);
+            }
+        }
+    }
+
+    private static void performContentBasedFiltering(){}
+
     public static void main(String[] args) {
         // 1. Parse your CSV into a list of MovieRish
         List<Movie> movies = parseData("CSC466-Final-Project/data/movies_metadata_small.csv");
 
         // 2. Create MovieMatrixRish with features, means, stds
         MovieMatrix matrix = new MovieMatrix(movies);
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
 
-//        int x = 0;
-//        for (MovieRish movie : movies) {
-//            if (x >= 5) {
-//                break;
-//            }
-//            System.out.println(movie.getTitle() + " " + movie.getVoteAverage());
-//            x++;
-//        }
+            System.out.print("Would you like to perform knn (a) or content based filtering (b) or to quit (quit) ");
+            String option = scanner.nextLine().toLowerCase();
+            if(option.equalsIgnoreCase("a")){
+                performKNN(movies,matrix);
+            }
+            else if(option.equalsIgnoreCase("b")){
 
-        // 3. Ask user for movie title
-            while(true) {
-                Scanner scanner = new Scanner(System.in);
-                System.out.print("Enter a movie title: ");
-                String inputTitle = scanner.nextLine().toLowerCase();
-                if(inputTitle.equalsIgnoreCase("Quit")){
-                    break;
-                }
-                Movie selectedMovie = null;
-                int movieIdx = -1;
-                for (int i = 0; i < movies.size(); i++) {
-                    if (movies.get(i).getTitle().toLowerCase().equals(inputTitle)) {
-                        selectedMovie = movies.get(i);
-                        System.out.println("Real rating: " + selectedMovie.getVoteAverage());
-                        movieIdx = i;
-                        break;
-                    }
-                }
-
-                if (selectedMovie == null) {
-                    System.out.println("Movie not found in dataset.");
-
-                }
-                else {
-
-                    // 5. Predict rating using KNN (choose k, e.g., 5)
-                    int k = 5;
-                    double predictedRating = matrix.predictRating(movieIdx, k);
-
-                    System.out.println("Predicted rating for \"" + selectedMovie.getTitle() + "\": " + predictedRating);
-                }
+            }
+            else if(option.equalsIgnoreCase("quit")){
+                break;
+            }
+            else{
+                System.out.println("That is not a valid option try again");
             }
         }
+    }
 }
