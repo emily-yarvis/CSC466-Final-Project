@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -168,13 +169,20 @@ public class Main {
                     break;
                 }
             }
-            movieIdxs.add(movieIdx);
             if (selectedMovie == null) {
                 System.out.println("Movie not found in dataset.");
 
             }
+            else{
+                movieIdxs.add(movieIdx);
+            }
         }
         return new Profile(inputName, movieIdxs);
+    }
+
+    public List<Movie> recommendForUserProfile(List<Movie> movies,Profile userProfile, int topN) {
+        List<Neighbor> neighbors = new ArrayList<>();
+        return null;
     }
     private static void performKNN(List<Movie> movies, MovieMatrix matrix){
         while(true) {
@@ -210,7 +218,9 @@ public class Main {
         }
     }
 
-    private static void performContentBasedFiltering(){}
+    private static void performContentBasedFiltering(List<Movie> movies, MovieMatrix matrix){
+        System.out.println(buildProfile(movies).toString());
+    }
 
     public static void main(String[] args) {
         // 1. Parse your CSV into a list of MovieRish
@@ -227,7 +237,7 @@ public class Main {
                 performKNN(movies,matrix);
             }
             else if(option.equalsIgnoreCase("b")){
-
+                performContentBasedFiltering(movies,matrix);
             }
             else if(option.equalsIgnoreCase("quit")){
                 break;

@@ -20,6 +20,14 @@ public class Profile {
         this.likedMovies = likedMovies;
     }
 
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "likedMovies=" + likedMovies +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
     public String getName() {
         return name;
     }
