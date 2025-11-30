@@ -6,6 +6,10 @@ public class MovieMatrix {
     private double[] means;
     private double[] stds;
 
+    public double[][] getFeatures() {
+        return features;
+    }
+
     // All of the following are sorted
     private List<String> GENRES;
     private List<String> COUNTRIES;
