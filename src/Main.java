@@ -256,7 +256,7 @@ public class Main {
         double[][] features = matrix.getFeatures();
         int kClusters = 20;   //adjustable
         int maxIters  = 100;
-        double minImprovement = 1e-4; // stopping threshold on SSE
+        double minImprovement = 1e-4; 
 
             KMeansResult result = kMeans(features, kClusters, maxIters, minImprovement);
 
@@ -326,14 +326,12 @@ public class Main {
 
             try (PrintWriter pw = new PrintWriter(new FileWriter(outPath))) {
 
-                // header
                 pw.print("title");
                 for (int i = 0; i < features[0].length; i++) {
                     pw.print(",f" + i);
                 }
                 pw.println();
 
-                // rows
                 for (int i = 0; i < movies.size(); i++) {
                     Movie m = movies.get(i);
                     pw.print("\"" + m.getTitle().replace("\"", "") + "\"");
@@ -348,7 +346,6 @@ public class Main {
             System.out.println("Exported PCA features to: " + outPath);
         }
 
-        // K-means as in lecture: random seeds, assign, recompute, stop when SSE converges.
         private static KMeansResult kMeans ( double[][] matrix, int k, int maxIters, double minImprovement){
             int n = matrix.length;
             int dimensions = matrix[0].length;
@@ -437,7 +434,6 @@ public class Main {
             return sum;
         }
 
-        // Distortion / SSE = sum over points of squared distance to its centroid
         private static double computeSSE ( double[][] X, double[][] centroids, int[] assignments){
             double sse = 0.0;
             for (int i = 0; i < X.length; i++) {
