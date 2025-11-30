@@ -251,11 +251,12 @@ public class Main {
 /// /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //KMeansClustering Utils
 
-        private static void performKMeansClustering (List < Movie > movies, MovieMatrix matrix){
-            double[][] features = matrix.getFeatures();
-            int kClusters = 20;   // you can tune this
-            int maxIters = 100;
-            double minImprovement = 1e-4; // stopping threshold on SSE
+
+    private static void performKMeansClustering(List<Movie> movies, MovieMatrix matrix) {
+        double[][] features = matrix.getFeatures();
+        int kClusters = 20;   //adjustable
+        int maxIters  = 100;
+        double minImprovement = 1e-4; // stopping threshold on SSE
 
             KMeansResult result = kMeans(features, kClusters, maxIters, minImprovement);
 
@@ -265,14 +266,14 @@ public class Main {
 
             int[] assignments = result.assignments;
 
-            // interactive prediction loop (same idea you already had)
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("Enter a movie title for k-means prediction (or 'quit'): ");
-                String inputTitle = scanner.nextLine().trim();
-                if (inputTitle.equalsIgnoreCase("quit")) {
-                    break;
-                }
+
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print("Enter a movie title for k-means prediction (or 'quit'): ");
+            String inputTitle = scanner.nextLine().trim();
+            if (inputTitle.equalsIgnoreCase("quit")){
+                break;
+            }
 
                 int movieIdx = findMovieIndexByTitle(movies, inputTitle);
                 if (movieIdx == -1) {
